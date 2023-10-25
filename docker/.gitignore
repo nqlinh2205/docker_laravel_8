@@ -1,0 +1,4 @@
+./Makefile
+./container/log/*.log
+./container/mysql/*
+./container/scrips

@@ -1,0 +1,55 @@
+version: '3.2'
+
+services:
+  app:
+    build:
+      context: ../ecommerce
+      dockerfile: ../docker/container/app/Dockerfile
+    container_name: webike_app
+    working_dir: /var/www/html
+    restart: unless-stopped
+    tty: true
+    platform: linux/arm64/v8
+    volumes:
+      - ../ecommerce:/var/www/html
+      # Log
+      - ../docker/container/log/php-fpm/php-fpm.log:/var/log/php-fpm.log
+      #config
+      - ../docker/container/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app_db_network
+
+  mysql:
+    image: mysql:8
+    container_name: webike_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../docker/container/mysql:/var/lib/mysql/
+      - ../docker/container/log/mysql/mysql.log:/var/log/mysql.log
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: laravel_docker
+    platform: linux/arm64/v8
+    networks:
+      - app_db_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: webike_nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../ecommerce:/var/www/html
+      - ../docker/container/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../docker/container/nginx/conf.d/:/etc/nginx/conf.d/
+      - ../docker/container/log/nginx_log:/var/log/nginx
+    platform: linux/arm64/v8
+    networks:
+      - app_db_network
+
+networks:
+  app_db_network:
