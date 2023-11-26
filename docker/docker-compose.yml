@@ -51,5 +51,17 @@ services:
     networks:
       - app_db_network
 
+  nodejs:
+    image: node:alpine  
+    container_name: webike_nodejs
+    restart: unless-stopped
+    working_dir: /var/www/html
+    tty: true
+    volumes:
+      - ../ecommerce:/var/www/html
+    platform: linux/arm64/v8
+    networks:
+      - app_db_network 
+
 networks:
   app_db_network:
